@@ -10,7 +10,7 @@ so migration/addaptation effort is kept at a minimum.
 
 ```python
 import sys
-sys.path.insert(0, "../../")    # relative to notebook dir
+sys.path.insert(0, "../")    # relative to notebook dir
 import venta_protocol_v2_device
 ```
 
