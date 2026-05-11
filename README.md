@@ -1,3 +1,5 @@
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)
+
 # venta_protocol_v2_device
 
 Small Python library to control Venta Air Humidifiers and Washers that use Protocol Version 2 (i.e., the ones using the `/datastructure` endpoint).
@@ -10,7 +12,7 @@ so migration/addaptation effort is kept at a minimum.
 
 ```python
 import sys
-sys.path.insert(0, "../../")    # relative to notebook dir
+sys.path.insert(0, "../")    # relative to notebook dir
 import venta_protocol_v2_device
 ```
 
