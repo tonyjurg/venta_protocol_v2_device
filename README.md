@@ -8,7 +8,7 @@ This package intentionally mirrors the public API style of
 [`venta_protocol_v3_device`](https://github.com/bobiboy/venta_protocol_v3_device)
 so migration/addaptation effort is kept at a minimum.
 
-## Example usage (without `pip install`)
+## Example usage (local; without `pip install`)
 
 ```python
 import sys
@@ -16,7 +16,7 @@ sys.path.insert(0, "../")    # relative to notebook dir
 import venta_protocol_v2_device
 ```
 
-## Example usage (once `pip install` is functioning)
+## Example usage (using `pip install`)
 
 ```python
 from venta_protocol_v2_device import Venta_Protocol_v2_Device
@@ -25,7 +25,6 @@ d = Venta_Protocol_v2_Device("192.168.178.87")
 print(d.getStatus())
 print(d.toJSON())
 ```
-
 
 ## Notebook examples
 
