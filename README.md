@@ -28,7 +28,7 @@ print(d.toJSON())
 
 ## Notebook examples
 
-For longer, guided examples in Jupyter notebooks, see [`examples/notebooks`](examples/notebooks/README.md):
+For longer, guided examples in Jupyter notebooks, see [`usage/basic_device_control.ipynb`](usage/basic_device_control.ipynb):
 
 - Basic single-device control workflow.
 
