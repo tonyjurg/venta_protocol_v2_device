@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name='venta-protocol-v2-device',
-    version='0.1.0',
+    version='0.1.1',
     description='Control Venta Air Humidifiers that use Protocol Version 2',
     long_description=long_description,
     long_description_content_type='text/markdown',
