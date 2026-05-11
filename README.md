@@ -19,6 +19,7 @@ import venta_protocol_v2_device
 ## Example usage (using `pip install`)
 
 ```python
+!pip install venta_protocol_v2_device
 from venta_protocol_v2_device import Venta_Protocol_v2_Device
 
 d = Venta_Protocol_v2_Device("192.168.178.87")
