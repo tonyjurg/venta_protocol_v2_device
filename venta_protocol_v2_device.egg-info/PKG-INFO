@@ -1,23 +1,23 @@
 Metadata-Version: 2.4
 Name: venta-protocol-v2-device
-Version: 0.1.0
+Version: 0.1.2
 Summary: Control Venta Air Humidifiers that use Protocol Version 2
-Home-page: https://github.com/tonyjurg/venta_protocol_v2_device
-License: MIT
+Author: Tony Jurg
+License-Expression: MIT
+Project-URL: Homepage, https://tonyjurg.github.io/venta_protocol_v2_device/
+Project-URL: Repository, https://github.com/tonyjurg/venta_protocol_v2_device
+Project-URL: Issues, https://github.com/tonyjurg/venta_protocol_v2_device/issues
 Classifier: Intended Audience :: Developers
-Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 3
 Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
 Description-Content-Type: text/markdown
-Requires-Dist: requests
-Dynamic: classifier
-Dynamic: description
-Dynamic: description-content-type
-Dynamic: home-page
-Dynamic: license
-Dynamic: requires-dist
-Dynamic: summary
+License-File: LICENSE
+Requires-Dist: requests<3,>=2.31.0
+Dynamic: license-file
+
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)  [![PyPI Version](https://img.shields.io/pypi/v/venta-protocol-v2-device)](https://pypi.org/project/venta-protocol-v2-device/)
 
 # venta_protocol_v2_device
 
@@ -27,17 +27,18 @@ This package intentionally mirrors the public API style of
 [`venta_protocol_v3_device`](https://github.com/bobiboy/venta_protocol_v3_device)
 so migration/addaptation effort is kept at a minimum.
 
-## Example usage (without `pip install`)
+## Example usage (local; without `pip install`)
 
 ```python
 import sys
-sys.path.insert(0, "../../")    # relative to notebook dir
+sys.path.insert(0, "../")    # relative to notebook dir
 import venta_protocol_v2_device
 ```
 
-## Example usage (once `pip install` is functioning)
+## Example usage (using `pip install`)
 
 ```python
+!pip install venta_protocol_v2_device
 from venta_protocol_v2_device import Venta_Protocol_v2_Device
 
 d = Venta_Protocol_v2_Device("192.168.178.87")
@@ -45,10 +46,9 @@ print(d.getStatus())
 print(d.toJSON())
 ```
 
-
 ## Notebook examples
 
-For longer, guided examples in Jupyter notebooks, see [`examples/notebooks`](examples/notebooks/README.md):
+For longer, guided examples in Jupyter notebooks, see [`usage/basic_device_control.ipynb`](usage/basic_device_control.ipynb):
 
 - Basic single-device control workflow.
 

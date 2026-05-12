@@ -1,4 +1,6 @@
+LICENSE
 README.md
+pyproject.toml
 setup.py
 venta_protocol_v2_device/__init__.py
 venta_protocol_v2_device.egg-info/PKG-INFO

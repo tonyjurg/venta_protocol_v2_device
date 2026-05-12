@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "venta-protocol-v2-device"
+version = "0.1.2"
+description = "Control Venta Air Humidifiers that use Protocol Version 2"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Tony Jurg" },
+]
+dependencies = [
+  "requests>=2.31.0,<3",
+]
+classifiers = [
+  "Intended Audience :: Developers",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://tonyjurg.github.io/venta_protocol_v2_device/"
+Repository = "https://github.com/tonyjurg/venta_protocol_v2_device"
+Issues = "https://github.com/tonyjurg/venta_protocol_v2_device/issues"
+
+[tool.setuptools]
+packages = ["venta_protocol_v2_device"]
+include-package-data = true
