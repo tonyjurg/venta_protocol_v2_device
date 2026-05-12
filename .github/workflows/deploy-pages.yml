@@ -24,8 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      # Clean up any previous "github-pages" artifacts (prevents duplicate error)
-      - name: Remove previous GitHub Pages artifacts
+      - name: Remove old artifacts (prevent duplicate error)
         uses: geekyeggo/delete-artifact@v5
         with:
           name: github-pages
