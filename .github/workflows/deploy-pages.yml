@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'docs/**'               # Only trigger on changes in docs folder
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
@@ -24,10 +24,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Clean up any previous "github-pages" artifacts (prevents duplicate error)
+      - name: Remove previous GitHub Pages artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: github-pages
+          failOnError: false
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: 'docs'           # Folder to deploy
+          path: 'docs'
 
       - name: Deploy to GitHub Pages
         id: deployment
