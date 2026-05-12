@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'docs/**'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -24,8 +25,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Build site
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+
       - name: Remove old artifacts (prevent duplicate error)
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: github-pages
           failOnError: false
@@ -33,7 +43,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: 'docs'
+          path: './_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
