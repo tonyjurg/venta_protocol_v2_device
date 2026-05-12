@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'doc/**'          # Only trigger when something in /doc changes
+      - 'docs/**'          # Only trigger when something in /doc changes
   workflow_dispatch:      # Allows manual trigger if needed
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'doc'         # This is the folder that will be deployed
+          path: 'docs'         # This is the folder that will be deployed
 
       - name: Deploy to GitHub Pages
         id: deployment
