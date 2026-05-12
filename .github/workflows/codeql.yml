@@ -3,13 +3,17 @@ name: "CodeQL"
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'          # ← Skip CodeQL when only docs change
+    paths:
+      - '.github/workflows/**'
+      - 'setup.py'
+      - 'venta_protocol_v2_device/**'
 
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'
+    paths:
+      - '.github/workflows/**'
+      - 'setup.py'
+      - 'venta_protocol_v2_device/**'
 
 jobs:
   analyze:
@@ -23,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'python' ]   # You only need Python for this repo
+        language: [ 'python' ]
 
     steps:
       - name: Checkout repository
@@ -33,7 +37,6 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          # Optional: Remove docs from scanning
           config: |
             paths-ignore:
               - docs
