@@ -9,7 +9,7 @@ description: A small Python package for controlling Venta air humidifiers and ai
 
 `venta-protocol-v2-device` is a small Python package for controlling Venta air humidifiers and air washers on your local network.
 
-It is made for Venta devices that use protocol version 2 and expose the `/datastructure` endpoint. You give the package the device IP address, and it lets you read the current status or send simple control commands from Python.
+It is made for Venta devices that use **protocol version 2** and expose the `/datastructure` endpoint. You give the package the device IP address, and it lets you read the current status or send simple control commands from Python. If you want to control devices using **protocol version 3**, you can examine [`bobiboy/venta_protocol_v3_device`](https://github.com/bobiboy/venta_protocol_v3_device).
 
 ## What This Package Does
 
