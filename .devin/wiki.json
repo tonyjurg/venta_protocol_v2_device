@@ -1,0 +1,183 @@
+{
+  "repo_notes": [
+    {
+      "content": ""
+    }
+  ],
+  "pages": [
+    {
+      "title": "Overview",
+      "purpose": "High-level introduction to the venta-protocol-v2-device library: what it does, who it is for, how it fits into the Venta device ecosystem, and links to child pages for deeper detail.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Getting Started",
+      "purpose": "Step-by-step guide for installing the package, locating your device IP address, and running the first status query. Covers pip install, local (editable) install, and the quick-start code example.",
+      "parent": "Overview",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Device Discovery and Network Requirements",
+      "purpose": "Explains why Protocol V2 does not support UDP-based auto-discovery (unlike V3), how to find the device IP, and best practices for DHCP reservations to ensure stable addressing.",
+      "parent": "Overview",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Core Library Architecture",
+      "purpose": "Overview of the venta_protocol_v2_device Python package internals: the single-class design, the /datastructure HTTP endpoint, the request/response lifecycle, and links to child pages covering the API and data model in detail.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Venta_Protocol_v2_Device Class — Public API",
+      "purpose": "Detailed reference for every public method of the Venta_Protocol_v2_Device class: constructor, getStatus(), toJSON(), all set* control methods, and runUpdate(). Includes parameter types, return values, and side-effects.",
+      "parent": "Core Library Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Device State Model and Data Categories",
+      "purpose": "Documents all instance attributes populated by getStatus() and _processResponse(), organized into the four hardware data blocks (Header, Action, Info, Measure) plus the derived DaysToService field. Explains how raw /datastructure JSON maps to Python attributes.",
+      "parent": "Core Library Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Internal Methods and Communication Layer",
+      "purpose": "Covers the private implementation details: _makeCall(), _setAction(), _processResponse(), _walkProperties(), and the three _require_* type-validation helpers. Explains the HTTP POST flow to /datastructure, timeout handling, and error propagation.",
+      "parent": "Core Library Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Usage Examples",
+      "purpose": "Overview of the practical usage resources included in the repository, linking to child pages for the Jupyter notebook walkthrough and usage tips.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Jupyter Notebook Walkthrough",
+      "purpose": "Detailed guide to usage/basic_device_control.ipynb: how to run it, what each cell demonstrates (instantiation, getStatus output structure, each control method, type-error handling), and how to adapt it for real devices.",
+      "parent": "Usage Examples",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Home Automation and Scripting Patterns",
+      "purpose": "Practical patterns for integrating the library into automation workflows: polling loops, error handling for offline devices, logging, and comparison with the venta_protocol_v3_device API for migration.",
+      "parent": "Usage Examples",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Packaging and Distribution",
+      "purpose": "Overview of how the library is packaged and published, linking to child pages for build configuration and PyPI release process.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Build Configuration",
+      "purpose": "Documents pyproject.toml and setup.py: project metadata (name, version, license, authors), Python version requirements, the requests dependency pin, setuptools build backend, and the egg-info metadata files.",
+      "parent": "Packaging and Distribution",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "PyPI Release and Distribution Artifacts",
+      "purpose": "Explains the publish.yml GitHub Actions workflow that builds and uploads the package to PyPI on release events, the OIDC trusted-publishing mechanism, and the dist/ wheel and sdist artifacts.",
+      "parent": "Packaging and Distribution",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "CI/CD and Repository Automation",
+      "purpose": "Overview of the three GitHub Actions workflows and supporting configuration that automate quality checks, documentation deployment, and dependency management.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "CodeQL Security Analysis",
+      "purpose": "Details the codeql.yml workflow: triggers (push/PR to main), path filters, the Python CodeQL matrix, autobuild step, docs/ exclusion, and how results surface in the GitHub Security tab.",
+      "parent": "CI/CD and Repository Automation",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Documentation Deployment Pipeline",
+      "purpose": "Explains the deploy-pages.yml workflow: Jekyll build from docs/, artifact management to avoid duplicates, GitHub Pages deployment, and the manual workflow_dispatch trigger.",
+      "parent": "CI/CD and Repository Automation",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Dependency Management and Repository Governance",
+      "purpose": "Covers the Dependabot configuration for automated dependency updates, the CODEOWNERS file assigning @tonyjurg as reviewer, and the .gitignore patterns.",
+      "parent": "CI/CD and Repository Automation",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Glossary",
+      "purpose": "Definitions of all codebase-specific terms, protocol concepts, attribute names, and abbreviations that an onboarding engineer needs to understand when working with this library. Each entry includes code pointers.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    }
+  ]
+}
