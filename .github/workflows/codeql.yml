@@ -2,7 +2,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, development ]
     paths:
       - '.github/workflows/**'
       - 'pyproject.toml'
@@ -10,7 +10,7 @@ on:
       - 'venta_protocol_v2_device/**'
 
   pull_request:
-    branches: [ main ]
+    branches: [ main, development ]
     paths:
       - '.github/workflows/**'
       - 'pyproject.toml'
@@ -40,6 +40,8 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config: |
+            queries:
+              - uses: security-extended
             paths-ignore:
               - docs
 
