@@ -1,9 +1,23 @@
 import json
 import logging
 import math
+from dataclasses import dataclass
+from ipaddress import IPv4Address, ip_address, ip_network
 from typing import Any, Dict, Optional
 
 import requests
+
+
+_PRIVATE_IPV4_NETWORKS = (
+    ip_network("10.0.0.0/8"),
+    ip_network("172.16.0.0/12"),
+    ip_network("192.168.0.0/16"),
+)
+
+
+@dataclass(frozen=True)
+class _DeviceEndpoint:
+    host: str
 
 
 class Venta_Protocol_v2_Device:
@@ -13,10 +27,46 @@ class Venta_Protocol_v2_Device:
     while adapting request/response handling to the V2 endpoint (/datastructure).
     """
 
+    _RESPONSE_FIELD_TYPES = {
+        "DeviceType": int,
+        "MacAdress": str,
+        "ProtocolV": str,
+        "Status": str,
+        "Power": bool,
+        "FanSpeed": int,
+        "TargetHum": int,
+        "SleepMode": bool,
+        "Automatic": bool,
+        "BaLiNormal": int,
+        "BaLiSleep": int,
+        "BaLiStandby": int,
+        "LEDStripActive": bool,
+        "LEDStripMode": int,
+        "LEDStrip": str,
+        "SWMain": str,
+        "SWWIFI": str,
+        "OperationT": int,
+        "DiscIonT": int,
+        "CleaningT": int,
+        "FilterT": int,
+        "ServiceT": int,
+        "HwIndexMB": int,
+        "HwIndexOption": int,
+        "Warnings": int,
+        "Temperature": int,
+        "Humidity": int,
+        "Dust": int,
+        "WaterLevel": int,
+        "FanRpm": int,
+        "FanRpm2": int,
+    }
+
     _MAX_RESPONSE_BYTES = 256 * 1024
 
     def __init__(self, IP: str):
-        self.IP: str = IP
+        validated_ip = self._validate_device_ip(IP)
+        self._endpoint = _DeviceEndpoint(validated_ip)
+        self.IP: str = validated_ip
 
         # Header
         self.DeviceType: int = 0
@@ -134,15 +184,49 @@ class Venta_Protocol_v2_Device:
             raise TypeError(f"{name} must be str, got {type(value).__name__}")
         return value
 
+    @staticmethod
+    def _validate_device_ip(value: Any) -> str:
+        if type(value) is not str:
+            raise TypeError(f"IP must be str, got {type(value).__name__}")
+
+        try:
+            address = ip_address(value)
+        except ValueError as exc:
+            raise ValueError("IP must be a valid private IPv4 address") from exc
+
+        if not isinstance(address, IPv4Address) or not any(
+            address in network for network in _PRIVATE_IPV4_NETWORKS
+        ):
+            raise ValueError("IP must be a private IPv4 address used on the local network")
+
+        return str(address)
+
     def _setAction(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         return self._makeCall("/datastructure", {"Action": payload})
 
     def _makeCall(self, endpoint: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        url = f"http://{self.IP}{endpoint}"
+        connection = self._endpoint
+        if not isinstance(connection, _DeviceEndpoint):
+            raise RuntimeError("Device connection state is invalid")
+
+        url = f"http://{connection.host}{endpoint}"
         logging.debug("Sending payload to endpoint %s: %s", url, payload)
-        with requests.post(url, json=payload, timeout=10, stream=True) as response:
-            response.raise_for_status()
-            obj = self._readResponseJSON(response)
+        with requests.Session() as session:
+            session.trust_env = False
+            with session.post(
+                url,
+                json=payload,
+                timeout=10,
+                allow_redirects=False,
+                stream=True,
+            ) as response:
+                if 300 <= response.status_code < 400:
+                    raise requests.TooManyRedirects(
+                        "Device responses must not redirect requests"
+                    )
+
+                response.raise_for_status()
+                obj = self._readResponseJSON(response)
 
         self._processResponse(obj)
         return obj
@@ -182,12 +266,26 @@ class Venta_Protocol_v2_Device:
 
     def _processResponse(self, response: Dict[str, Any]) -> None:
         logging.debug("Processing response: %s", response)
-        self._walkProperties(response, callback=lambda prop, value: setattr(self, prop, value))
+        self._walkProperties(response, callback=self._setResponseProperty)
 
         if self.ServiceT > 0:
             # V2 does not expose ServiceMax directly; approx from 6 months in minutes.
             service_max = 180 * 24 * 60
             self.DaysToService = max(0, math.ceil((service_max - self.ServiceT) / (24 * 60)))
+
+    def _setResponseProperty(self, prop: str, value: Any) -> None:
+        expected_type = self._RESPONSE_FIELD_TYPES.get(prop)
+        if expected_type is None:
+            logging.debug("Ignoring unknown response property: %s", prop)
+            return
+
+        if type(value) is not expected_type:
+            raise TypeError(
+                f"Invalid response property {prop}: expected {expected_type.__name__}, "
+                f"got {type(value).__name__}"
+            )
+
+        setattr(self, prop, value)
 
     def _walkProperties(self, obj: Dict[str, Any], callback: callable, maxDepth: int = 3) -> None:
         if maxDepth <= 0:

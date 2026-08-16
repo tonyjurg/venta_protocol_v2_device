@@ -58,6 +58,15 @@ d = Venta_Protocol_v2_Device("192.168.178.87")
 
 If you need stable addressing, configure a DHCP reservation for the Venta device in your router or access point.
 
+## Network security
+
+Use this package only on a trusted local-area network and in a friendly environment. Venta protocol version 2 communicates over unauthenticated, unencrypted HTTP, so commands and telemetry can be observed or modified by anyone able to intercept local traffic.
+
+- Do not expose the Venta device directly to the internet.
+- Restrict device access to trusted hosts, preferably on an isolated home-automation network or VLAN.
+- Pass only a private IPv4 address that comes from trusted configuration; never accept a device address directly from an untrusted user or request.
+- Treat all device responses as untrusted network data.
+
 ## Logging and privacy
 
 Debug logging includes request payloads and complete device responses. These records can contain control actions, sensor telemetry, device identifiers, and MAC addresses. Enable debug logging only on a trusted LAN and in a friendly environment. Protect log files from unauthorized access, retain them only as long as necessary, and redact sensitive values before sharing logs publicly.
