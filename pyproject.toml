@@ -14,7 +14,7 @@ authors = [
   { name = "Tony Jurg" },
 ]
 dependencies = [
-  "requests>=2.31.0,<3",
+  "requests>=2.32.4,<3",
 ]
 classifiers = [
   "Intended Audience :: Developers",
