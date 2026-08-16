@@ -71,5 +71,5 @@ def test_response_ip_cannot_redirect_the_connection() -> None:
 
     device._processResponse({"Header": {"IP": "127.0.0.1:8080"}})
 
-    assert device.IP == "127.0.0.1:8080"
+    assert device.IP == "192.168.1.20"
     assert device._endpoint.host == "192.168.1.20"

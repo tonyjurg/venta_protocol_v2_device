@@ -27,6 +27,40 @@ class Venta_Protocol_v2_Device:
     while adapting request/response handling to the V2 endpoint (/datastructure).
     """
 
+    _RESPONSE_FIELD_TYPES = {
+        "DeviceType": int,
+        "MacAdress": str,
+        "ProtocolV": str,
+        "Status": str,
+        "Power": bool,
+        "FanSpeed": int,
+        "TargetHum": int,
+        "SleepMode": bool,
+        "Automatic": bool,
+        "BaLiNormal": int,
+        "BaLiSleep": int,
+        "BaLiStandby": int,
+        "LEDStripActive": bool,
+        "LEDStripMode": int,
+        "LEDStrip": str,
+        "SWMain": str,
+        "SWWIFI": str,
+        "OperationT": int,
+        "DiscIonT": int,
+        "CleaningT": int,
+        "FilterT": int,
+        "ServiceT": int,
+        "HwIndexMB": int,
+        "HwIndexOption": int,
+        "Warnings": int,
+        "Temperature": int,
+        "Humidity": int,
+        "Dust": int,
+        "WaterLevel": int,
+        "FanRpm": int,
+        "FanRpm2": int,
+    }
+
     def __init__(self, IP: str):
         validated_ip = self._validate_device_ip(IP)
         self._endpoint = _DeviceEndpoint(validated_ip)
@@ -189,12 +223,26 @@ class Venta_Protocol_v2_Device:
 
     def _processResponse(self, response: Dict[str, Any]) -> None:
         logging.debug("Processing response: %s", response)
-        self._walkProperties(response, callback=lambda prop, value: setattr(self, prop, value))
+        self._walkProperties(response, callback=self._setResponseProperty)
 
         if self.ServiceT > 0:
             # V2 does not expose ServiceMax directly; approx from 6 months in minutes.
             service_max = 180 * 24 * 60
             self.DaysToService = max(0, math.ceil((service_max - self.ServiceT) / (24 * 60)))
+
+    def _setResponseProperty(self, prop: str, value: Any) -> None:
+        expected_type = self._RESPONSE_FIELD_TYPES.get(prop)
+        if expected_type is None:
+            logging.debug("Ignoring unknown response property: %s", prop)
+            return
+
+        if type(value) is not expected_type:
+            raise TypeError(
+                f"Invalid response property {prop}: expected {expected_type.__name__}, "
+                f"got {type(value).__name__}"
+            )
+
+        setattr(self, prop, value)
 
     def _walkProperties(self, obj: Dict[str, Any], callback: callable, maxDepth: int = 3) -> None:
         if maxDepth <= 0:
