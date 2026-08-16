@@ -119,6 +119,10 @@ Use this package only on a trusted local-area network and in a friendly environm
 - Configure the device with a trusted private IPv4 address; do not pass an address obtained directly from an untrusted user or request.
 - Treat data returned by the device as untrusted network input.
 
+## Logging and Privacy
+
+Debug logging records request payloads and complete device responses. Logs can therefore contain control actions, sensor telemetry, device identifiers, and MAC addresses. Enable debug logging only on a trusted LAN and in a friendly environment. Restrict access to log files, retain them only as long as needed, and redact sensitive values before sharing logs publicly.
+
 ## Notes
 
 - The package communicates with devices over the local network.

@@ -61,6 +61,8 @@ class Venta_Protocol_v2_Device:
         "FanRpm2": int,
     }
 
+    _MAX_RESPONSE_BYTES = 256 * 1024
+
     def __init__(self, IP: str):
         validated_ip = self._validate_device_ip(IP)
         self._endpoint = _DeviceEndpoint(validated_ip)
@@ -211,14 +213,55 @@ class Venta_Protocol_v2_Device:
         logging.debug("Sending payload to endpoint %s: %s", url, payload)
         with requests.Session() as session:
             session.trust_env = False
-            response = session.post(url, json=payload, timeout=10, allow_redirects=False)
+            with session.post(
+                url,
+                json=payload,
+                timeout=10,
+                allow_redirects=False,
+                stream=True,
+            ) as response:
+                if 300 <= response.status_code < 400:
+                    raise requests.TooManyRedirects(
+                        "Device responses must not redirect requests"
+                    )
 
-        if 300 <= response.status_code < 400:
-            raise requests.TooManyRedirects("Device responses must not redirect requests")
+                response.raise_for_status()
+                obj = self._readResponseJSON(response)
 
-        response.raise_for_status()
-        obj = response.json()
         self._processResponse(obj)
+        return obj
+
+    def _readResponseJSON(self, response: requests.Response) -> Dict[str, Any]:
+        content_length = response.headers.get("Content-Length")
+        if content_length is not None:
+            try:
+                declared_length = int(content_length)
+            except ValueError as exc:
+                raise ValueError("Device returned an invalid Content-Length header") from exc
+
+            if declared_length < 0 or declared_length > self._MAX_RESPONSE_BYTES:
+                raise ValueError(
+                    f"Device response exceeds the {self._MAX_RESPONSE_BYTES}-byte limit"
+                )
+
+        body = bytearray()
+        for chunk in response.iter_content(chunk_size=8192):
+            if not chunk:
+                continue
+            if len(body) + len(chunk) > self._MAX_RESPONSE_BYTES:
+                raise ValueError(
+                    f"Device response exceeds the {self._MAX_RESPONSE_BYTES}-byte limit"
+                )
+            body.extend(chunk)
+
+        try:
+            obj = json.loads(body)
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError("Device returned invalid JSON") from exc
+
+        if not isinstance(obj, dict):
+            raise ValueError("Device response must be a JSON object")
+
         return obj
 
     def _processResponse(self, response: Dict[str, Any]) -> None:
