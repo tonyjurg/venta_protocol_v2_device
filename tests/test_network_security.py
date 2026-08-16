@@ -35,7 +35,10 @@ def test_non_lan_destinations_are_rejected(address: str) -> None:
 def test_requests_ignore_environment_credentials_proxies_and_redirects() -> None:
     device = Venta_Protocol_v2_Device("192.168.1.20")
     response = MagicMock(status_code=200)
-    response.json.return_value = {}
+    response.headers = {}
+    response.iter_content.return_value = [b"{}"]
+    response.__enter__.return_value = response
+    response.__exit__.return_value = False
     session = MagicMock()
     session.__enter__.return_value = session
     session.__exit__.return_value = False
@@ -50,12 +53,15 @@ def test_requests_ignore_environment_credentials_proxies_and_redirects() -> None
         json=None,
         timeout=10,
         allow_redirects=False,
+        stream=True,
     )
 
 
 def test_redirect_responses_are_rejected() -> None:
     device = Venta_Protocol_v2_Device("192.168.1.20")
     response = MagicMock(status_code=302)
+    response.__enter__.return_value = response
+    response.__exit__.return_value = False
     session = MagicMock()
     session.__enter__.return_value = session
     session.__exit__.return_value = False
@@ -71,5 +77,5 @@ def test_response_ip_cannot_redirect_the_connection() -> None:
 
     device._processResponse({"Header": {"IP": "127.0.0.1:8080"}})
 
-    assert device.IP == "127.0.0.1:8080"
+    assert device.IP == "192.168.1.20"
     assert device._endpoint.host == "192.168.1.20"
