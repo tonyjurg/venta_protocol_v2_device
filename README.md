@@ -58,6 +58,10 @@ d = Venta_Protocol_v2_Device("192.168.178.87")
 
 If you need stable addressing, configure a DHCP reservation for the Venta device in your router or access point.
 
+## Logging and privacy
+
+Debug logging includes request payloads and complete device responses. These records can contain control actions, sensor telemetry, device identifiers, and MAC addresses. Enable debug logging only on a trusted LAN and in a friendly environment. Protect log files from unauthorized access, retain them only as long as necessary, and redact sensitive values before sharing logs publicly.
+
 ## Corrections and/or Additions
 
 Please feel free to raise issues or create pull request for corrections and/or additions.
