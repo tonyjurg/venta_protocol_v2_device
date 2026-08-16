@@ -110,6 +110,10 @@ device = Venta_Protocol_v2_Device("192.168.178.87")
 
 For reliable automation, it is best to reserve a fixed IP address for the Venta device in your router or access point.
 
+## Logging and Privacy
+
+Debug logging records request payloads and complete device responses. Logs can therefore contain control actions, sensor telemetry, device identifiers, and MAC addresses. Enable debug logging only on a trusted LAN and in a friendly environment. Restrict access to log files, retain them only as long as needed, and redact sensitive values before sharing logs publicly.
+
 ## Notes
 
 - The package communicates with devices over the local network.

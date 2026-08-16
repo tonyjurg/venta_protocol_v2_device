@@ -13,6 +13,8 @@ class Venta_Protocol_v2_Device:
     while adapting request/response handling to the V2 endpoint (/datastructure).
     """
 
+    _MAX_RESPONSE_BYTES = 256 * 1024
+
     def __init__(self, IP: str):
         self.IP: str = IP
 
@@ -138,10 +140,44 @@ class Venta_Protocol_v2_Device:
     def _makeCall(self, endpoint: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         url = f"http://{self.IP}{endpoint}"
         logging.debug("Sending payload to endpoint %s: %s", url, payload)
-        response = requests.post(url, json=payload, timeout=10)
-        response.raise_for_status()
-        obj = response.json()
+        with requests.post(url, json=payload, timeout=10, stream=True) as response:
+            response.raise_for_status()
+            obj = self._readResponseJSON(response)
+
         self._processResponse(obj)
+        return obj
+
+    def _readResponseJSON(self, response: requests.Response) -> Dict[str, Any]:
+        content_length = response.headers.get("Content-Length")
+        if content_length is not None:
+            try:
+                declared_length = int(content_length)
+            except ValueError as exc:
+                raise ValueError("Device returned an invalid Content-Length header") from exc
+
+            if declared_length < 0 or declared_length > self._MAX_RESPONSE_BYTES:
+                raise ValueError(
+                    f"Device response exceeds the {self._MAX_RESPONSE_BYTES}-byte limit"
+                )
+
+        body = bytearray()
+        for chunk in response.iter_content(chunk_size=8192):
+            if not chunk:
+                continue
+            if len(body) + len(chunk) > self._MAX_RESPONSE_BYTES:
+                raise ValueError(
+                    f"Device response exceeds the {self._MAX_RESPONSE_BYTES}-byte limit"
+                )
+            body.extend(chunk)
+
+        try:
+            obj = json.loads(body)
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError("Device returned invalid JSON") from exc
+
+        if not isinstance(obj, dict):
+            raise ValueError("Device response must be a JSON object")
+
         return obj
 
     def _processResponse(self, response: Dict[str, Any]) -> None:
