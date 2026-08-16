@@ -1,9 +1,23 @@
 import json
 import logging
 import math
+from dataclasses import dataclass
+from ipaddress import IPv4Address, ip_address, ip_network
 from typing import Any, Dict, Optional
 
 import requests
+
+
+_PRIVATE_IPV4_NETWORKS = (
+    ip_network("10.0.0.0/8"),
+    ip_network("172.16.0.0/12"),
+    ip_network("192.168.0.0/16"),
+)
+
+
+@dataclass(frozen=True)
+class _DeviceEndpoint:
+    host: str
 
 
 class Venta_Protocol_v2_Device:
@@ -14,7 +28,9 @@ class Venta_Protocol_v2_Device:
     """
 
     def __init__(self, IP: str):
-        self.IP: str = IP
+        validated_ip = self._validate_device_ip(IP)
+        self._endpoint = _DeviceEndpoint(validated_ip)
+        self.IP: str = validated_ip
 
         # Header
         self.DeviceType: int = 0
@@ -132,13 +148,40 @@ class Venta_Protocol_v2_Device:
             raise TypeError(f"{name} must be str, got {type(value).__name__}")
         return value
 
+    @staticmethod
+    def _validate_device_ip(value: Any) -> str:
+        if type(value) is not str:
+            raise TypeError(f"IP must be str, got {type(value).__name__}")
+
+        try:
+            address = ip_address(value)
+        except ValueError as exc:
+            raise ValueError("IP must be a valid private IPv4 address") from exc
+
+        if not isinstance(address, IPv4Address) or not any(
+            address in network for network in _PRIVATE_IPV4_NETWORKS
+        ):
+            raise ValueError("IP must be a private IPv4 address used on the local network")
+
+        return str(address)
+
     def _setAction(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         return self._makeCall("/datastructure", {"Action": payload})
 
     def _makeCall(self, endpoint: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        url = f"http://{self.IP}{endpoint}"
+        connection = self._endpoint
+        if not isinstance(connection, _DeviceEndpoint):
+            raise RuntimeError("Device connection state is invalid")
+
+        url = f"http://{connection.host}{endpoint}"
         logging.debug("Sending payload to endpoint %s: %s", url, payload)
-        response = requests.post(url, json=payload, timeout=10)
+        with requests.Session() as session:
+            session.trust_env = False
+            response = session.post(url, json=payload, timeout=10, allow_redirects=False)
+
+        if 300 <= response.status_code < 400:
+            raise requests.TooManyRedirects("Device responses must not redirect requests")
+
         response.raise_for_status()
         obj = response.json()
         self._processResponse(obj)
