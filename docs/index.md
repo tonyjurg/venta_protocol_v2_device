@@ -130,6 +130,10 @@ Debug logging records request payloads and complete device responses. Logs can t
 - Network calls can fail if the device is offline, busy, or has changed IP address.
 - The package is intended for Venta devices using protocol version 2, not protocol version 3.
 
+## Codex Contribution
+
+OpenAI Codex contributed to this project by reviewing the implementation and proposing, implementing, and validating security fixes and code optimizations. This work included hardening device-response processing, restricting connections to trusted LAN addresses, strengthening dependency and CI security, bounding response sizes, and improving security documentation. All Codex-assisted changes were reviewed and regression-tested on a local Venta device by the maintainer before integration.
+
 ## License
 
 This project is released under the MIT License.
