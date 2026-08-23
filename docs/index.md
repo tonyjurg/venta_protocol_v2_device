@@ -110,12 +110,29 @@ device = Venta_Protocol_v2_Device("192.168.178.87")
 
 For reliable automation, it is best to reserve a fixed IP address for the Venta device in your router or access point.
 
+## Network Security
+
+Use this package only on a trusted local-area network and in a friendly environment. Venta protocol version 2 uses unauthenticated, unencrypted HTTP. It cannot protect commands or telemetry against observation or modification by another party with access to local traffic.
+
+- Do not expose the device directly to the internet.
+- Allow only trusted hosts to reach the device, preferably on an isolated home-automation network or VLAN.
+- Configure the device with a trusted private IPv4 address; do not pass an address obtained directly from an untrusted user or request.
+- Treat data returned by the device as untrusted network input.
+
+## Logging and Privacy
+
+Debug logging records request payloads and complete device responses. Logs can therefore contain control actions, sensor telemetry, device identifiers, and MAC addresses. Enable debug logging only on a trusted LAN and in a friendly environment. Restrict access to log files, retain them only as long as needed, and redact sensitive values before sharing logs publicly.
+
 ## Notes
 
 - The package communicates with devices over the local network.
 - The device must be reachable from the machine running the Python code.
 - Network calls can fail if the device is offline, busy, or has changed IP address.
 - The package is intended for Venta devices using protocol version 2, not protocol version 3.
+
+## Codex Contribution
+
+OpenAI Codex contributed to this project by reviewing the implementation and proposing, implementing, and validating security fixes and code optimizations. This work included hardening device-response processing, restricting connections to trusted LAN addresses, strengthening dependency and CI security, bounding response sizes, and improving security documentation. All Codex-assisted changes were reviewed and regression-tested on a local Venta device by the maintainer before integration.
 
 ## License
 
