@@ -71,6 +71,10 @@ Use this package only on a trusted local-area network and in a friendly environm
 
 Debug logging includes request payloads and complete device responses. These records can contain control actions, sensor telemetry, device identifiers, and MAC addresses. Enable debug logging only on a trusted LAN and in a friendly environment. Protect log files from unauthorized access, retain them only as long as necessary, and redact sensitive values before sharing logs publicly.
 
+## Codex contribution
+
+OpenAI Codex contributed to this project by reviewing the implementation and proposing, implementing, and validating security fixes and code optimizations. This work included hardening device-response processing, restricting connections to trusted LAN addresses, strengthening dependency and CI security, bounding response sizes, and improving security documentation. All Codex-assisted changes were reviewed and regression-tested on a local Venta device by the maintainer before integration.
+
 ## Corrections and/or Additions
 
 Please feel free to raise issues or create pull request for corrections and/or additions.
