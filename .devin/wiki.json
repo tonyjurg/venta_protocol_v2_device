@@ -1,181 +1,244 @@
 {
   "repo_notes": [
     {
-      "content": ""
+      "content": "Generate the wiki for venta-protocol-v2-device, a small Python library (import name venta_protocol_v2_device, class Venta_Protocol_v2_Device) for controlling Venta air humidifiers and air washers on a local network that use Venta protocol version 2, i.e. devices that expose the /datastructure HTTP endpoint. Treat pyproject.toml as the canonical version and metadata source (PyPI currently lists 0.1.0, 0.1.1 and 0.1.2, the latest published 2026-05-12). Describe the project as an early 0.1.x library: the API is small and mirrors the public API style of bobiboy/venta_protocol_v3_device for familiarity, but do not promise API stability that the repository does not state. Protocol v2 and protocol v3 are not successive versions of one product line to upgrade between: the type of Venta equipment determines which protocol version a device speaks, so users choose the library that matches their device. Never describe v3 as an upgrade of v2, and never describe an upgrade or migration path between the two libraries. Protocol v3 devices are covered by the separate bobiboy/venta_protocol_v3_device project, not by this repository."
+    },
+    {
+      "content": "Repository layout: the package is a flat top-level directory venta_protocol_v2_device/ (not a src/ layout), alongside tests/, usage/ (including usage/basic_device_control.ipynb), docs/ (a single-page Jekyll site, docs/index.md), .github/, .devin/, pyproject.toml, setup.py, LICENSE and README.md. dist/ and venta_protocol_v2_device.egg-info/ are visible in the repository tree as committed build outputs; describe them factually as build artifacts, never as the source of truth for version or metadata. Do not document .devin/wiki.json itself as a runtime component. Inspect the actual tree before naming any file; do not assume a CITATION file or src/ directory exists."
+    },
+    {
+      "content": "Protocol facts that are documented in the repository: communication is plain HTTP to the device's /datastructure endpoint, and the documentation states that protocol v2 is unauthenticated and unencrypted. UDP-based auto-discovery as used by protocol v3 is not supported for v2 devices (the maintainer found this from sniffed UDP packets), so the device IP address must be supplied directly and a DHCP reservation is recommended. getStatus() reads the device state into instance attributes (documented examples: Power, FanSpeed, Humidity, Temperature, WaterLevel, plus dust and fan RPM sensor values) and toJSON() exports the state as formatted JSON. The control methods are setPower(bool), setSleepMode(bool), setAutomatic(bool), setFanSpeed(int), setTargetHum(int), setLEDStripActive(bool), setLEDStripMode(int), setLEDStripColor(str), setPowerMode(str) and runUpdate(str); each returns True when the device response reflects the requested value. Confirm every signature and attribute against the package source before documenting it."
+    },
+    {
+      "content": "Security and privacy are first-class topics for this repository. docs/index.md has sections on Network Security and on Logging and Privacy: use only on trusted LANs, never expose devices to the internet, consider isolating devices on a VLAN, treat device responses as untrusted input, and treat debug logs as sensitive because they can contain payloads, telemetry, device identifiers and MAC addresses. The documentation also credits OpenAI Codex with security hardening, LAN-only connection restrictions, response-size bounds and documentation improvements, reviewed and regression-tested by the maintainer on a local device. Read the package source and tests to document exactly what restrictions and bounds exist and how they behave; do not invent mechanisms, limits, authentication or encryption that the code does not implement. Report the AI-assistance statement factually and neutrally."
+    },
+    {
+      "content": "Earlier generated wiki text may be stale. In particular, verify rather than repeat these claims: that a requests dependency pin exists (the PyPI listing shows no declared dependencies, so check pyproject.toml and setup.py), that the library is a single class, that there are exactly three GitHub Actions workflows (the docs site shows badges for tests, CodeQL and Pages deployment, and a publish workflow exists, so enumerate .github/workflows/), and the internal method names (_makeCall, _setAction, _processResponse, _walkProperties and the _require_* validation helpers) after the hardening changes. Prefer current code, tests, workflows, pyproject.toml, setup.py, README.md, docs/index.md and the notebook over older wiki text."
+    },
+    {
+      "content": "Scope and honesty rules: this is a plain Python client library. Do not claim built-in Home Assistant, Homey, MQTT, async or event-driven support, a CLI, retries, authentication, TLS, device discovery, or support for specific Venta model numbers unless the repository contains it; the documentation names no specific models. Downstream smart-home integrations may wrap the library, but they are not part of this repository. Avoid duplicating material across pages: overview pages summarize and link to focused pages, and the security model and the choice of protocol library each have one authoritative page. Use exact file paths and source-backed statements, and keep device or protocol limitations separate from project defects."
     }
   ],
   "pages": [
     {
       "title": "Overview",
-      "purpose": "High-level introduction to the venta-protocol-v2-device library: what it does, who it is for, how it fits into the Venta device ecosystem, and links to child pages for deeper detail.",
+      "purpose": "Introduce venta-protocol-v2-device: what it does, which Venta devices (protocol version 2, /datastructure endpoint) it targets, who it is for, how it relates to the separate protocol v3 library (the device type decides which library applies), and where to find setup, architecture, security, usage, packaging and CI documentation. Keep it concise and route readers to focused pages.",
       "page_notes": [
         {
-          "content": ""
+          "content": "Use README.md, docs/index.md, pyproject.toml and the PyPI metadata for identity. State that the project is an early 0.1.x release series licensed under MIT and that it requires Python 3 (PyPI lists >=3.8; confirm in pyproject.toml). Mention the security posture (trusted LAN only, unauthenticated HTTP) in one sentence and link to the security page."
         }
       ]
     },
     {
       "title": "Getting Started",
-      "purpose": "Step-by-step guide for installing the package, locating your device IP address, and running the first status query. Covers pip install, local (editable) install, and the quick-start code example.",
+      "purpose": "Step-by-step guide for installing the package (pip install venta-protocol-v2-device, or an editable local install), finding the device IP address, and running the first getStatus() query and a first control call.",
       "parent": "Overview",
       "page_notes": [
         {
-          "content": ""
+          "content": "Use README.md, docs/index.md and usage/basic_device_control.ipynb. Base the quick-start on the documented example: create Venta_Protocol_v2_Device with the device IP, call getStatus(), then read attributes, set power, fan speed and target humidity. Include a short note about LAN-only use and link to the security page. Do not show examples for methods that are not in the source. Begin with a short check that the reader's device is a protocol v2 device (it exposes /datastructure); if it is a protocol v3 device, point to bobiboy/venta_protocol_v3_device instead. Do not describe this as an upgrade."
         }
       ]
     },
     {
       "title": "Device Discovery and Network Requirements",
-      "purpose": "Explains why Protocol V2 does not support UDP-based auto-discovery (unlike V3), how to find the device IP, and best practices for DHCP reservations to ensure stable addressing.",
+      "purpose": "Explain why protocol v2 has no UDP auto-discovery (unlike v3), how to find the device IP address, DHCP reservation best practices, and the network assumptions (same LAN or routed private network, no internet exposure).",
       "parent": "Overview",
       "page_notes": [
         {
-          "content": ""
+          "content": "Use docs/index.md (Device Discovery and Network Security sections) and README.md. Attribute the no-discovery finding to the maintainer's analysis of sniffed UDP packets as stated in the documentation. Cross-link to the security page for VLAN and exposure guidance rather than repeating it."
+        }
+      ]
+    },
+    {
+      "title": "Choosing the Right Protocol Library",
+      "purpose": "Explain that the type of Venta equipment determines which protocol version a device uses, so users pick the matching library: this one for protocol v2 devices (/datastructure endpoint) or bobiboy/venta_protocol_v3_device for protocol v3 devices. Summarize the practical differences (for example discovery) and the shared API style, and state clearly that there is no upgrade or migration path from v2 to v3.",
+      "parent": "Overview",
+      "page_notes": [
+        {
+          "content": "Base the page only on statements in README.md, docs/index.md, the PyPI description and the source: protocol v2 devices use the /datastructure endpoint, v3-style UDP discovery is not supported for v2 devices, and the public API style mirrors the v3 library. Do not describe v3 internals that cannot be verified from this repository, and do not list device model numbers unless the repository does. Do not use the words upgrade, migrate or migration for moving between protocol versions: a device does not change protocol version, so the reader's hardware decides which library to use. If the repository offers no way to identify a device's protocol version, say so plainly and suggest checking the device's documentation or the maintainers' issue tracker. This is the single authoritative page on protocol selection; other pages should link here."
+        }
+      ]
+    },
+    {
+      "title": "Repository Layout",
+      "purpose": "Give contributors a concise map of the repository: the venta_protocol_v2_device/ package, tests/, usage/, docs/, .github/, package metadata files, and which items are source versus committed build output.",
+      "parent": "Overview",
+      "page_notes": [
+        {
+          "content": "Use the current repository tree. Note that the package is a flat top-level directory, not a src/ layout, and that dist/ and the egg-info directory are committed build artifacts. Do not list cache directories, virtual environments or pyc files as project components."
         }
       ]
     },
     {
       "title": "Core Library Architecture",
-      "purpose": "Overview of the venta_protocol_v2_device Python package internals: the single-class design, the /datastructure HTTP endpoint, the request/response lifecycle, and links to child pages covering the API and data model in detail.",
+      "purpose": "Describe the package internals at a high level: the Venta_Protocol_v2_Device class, the /datastructure HTTP endpoint, the request/response lifecycle, the hardening layer, and links to the API, state model and internals pages.",
       "page_notes": [
         {
-          "content": ""
+          "content": "Organize around responsibilities (state, communication, validation, security bounds), not a top-to-bottom reading of the source. Verify from the current source whether the design is a single class or has helper modules, and say so accurately."
         }
       ]
     },
     {
       "title": "Venta_Protocol_v2_Device Class — Public API",
-      "purpose": "Detailed reference for every public method of the Venta_Protocol_v2_Device class: constructor, getStatus(), toJSON(), all set* control methods, and runUpdate(). Includes parameter types, return values, and side-effects.",
+      "purpose": "Detailed reference for every public method of the Venta_Protocol_v2_Device class: constructor, getStatus(), toJSON(), the set* control methods (setPower, setSleepMode, setAutomatic, setFanSpeed, setTargetHum, setLEDStripActive, setLEDStripMode, setLEDStripColor, setPowerMode) and runUpdate(). Include parameter types, accepted ranges or values, return values and side effects.",
       "parent": "Core Library Architecture",
       "page_notes": [
         {
-          "content": ""
+          "content": "Derive signatures, accepted values and validation from the current source and tests/. Document that each control method returns True when the device response reflects the requested value, and what happens on type errors, rejected values, timeouts or unreachable devices only as the code shows. Use a compact table for the control methods and keep prose short."
         }
       ]
     },
     {
       "title": "Device State Model and Data Categories",
-      "purpose": "Documents all instance attributes populated by getStatus() and _processResponse(), organized into the four hardware data blocks (Header, Action, Info, Measure) plus the derived DaysToService field. Explains how raw /datastructure JSON maps to Python attributes.",
+      "purpose": "Document the instance attributes populated by getStatus(), how raw /datastructure JSON maps to Python attributes, the hardware data blocks (Header, Action, Info, Measure) and derived fields such as DaysToService, and what toJSON() exports.",
       "parent": "Core Library Architecture",
       "page_notes": [
         {
-          "content": ""
+          "content": "The older wiki described Header, Action, Info and Measure blocks and a DaysToService field; confirm each against the current _processResponse and related code before keeping it. Cover the documented attributes (Power, FanSpeed, Humidity, Temperature, WaterLevel) and the dust and fan RPM sensor values. Mention that device identifiers and MAC addresses can appear in state or logs and link to the privacy page."
         }
       ]
     },
     {
       "title": "Internal Methods and Communication Layer",
-      "purpose": "Covers the private implementation details: _makeCall(), _setAction(), _processResponse(), _walkProperties(), and the three _require_* type-validation helpers. Explains the HTTP POST flow to /datastructure, timeout handling, and error propagation.",
+      "purpose": "Cover the private implementation: how requests are built and sent to /datastructure, how action payloads are constructed, how responses are parsed and walked, the type-validation helpers, timeouts, and error propagation.",
       "parent": "Core Library Architecture",
       "page_notes": [
         {
-          "content": ""
+          "content": "Use the current source and tests. Verify the names and behavior of _makeCall, _setAction, _processResponse, _walkProperties and the _require_* helpers, and describe where the LAN-only restriction and response-size bound are enforced if the code shows it. Do not claim retries, backoff, sessions or authentication unless present."
+        }
+      ]
+    },
+    {
+      "title": "Security Model and Network Hardening",
+      "purpose": "Explain the security posture: unauthenticated and unencrypted protocol v2 HTTP, the trusted-LAN-only recommendation, VLAN isolation, the library's connection restrictions and response-size bounds, treating device responses as untrusted input, and what the library cannot protect against.",
+      "page_notes": [
+        {
+          "content": "Use docs/index.md (Network Security and Codex Contribution sections), the source and tests/. Separate three things clearly: protocol limitations that originate in the Venta device (no authentication or encryption), mitigations implemented by this library (verify each in code), and operational advice for users. Do not overstate protection. This is the single authoritative security page."
+        }
+      ]
+    },
+    {
+      "title": "Logging, Privacy and Diagnostics",
+      "purpose": "Document how the library logs, what debug logs can contain (payloads, telemetry, device identifiers, MAC addresses), how to enable and restrict logging, and how to redact logs before sharing them in issues.",
+      "parent": "Security Model and Network Hardening",
+      "page_notes": [
+        {
+          "content": "Use docs/index.md (Logging and Privacy) and the logging calls in the source. Describe the logger name and levels only as the code shows. Provide practical guidance for attaching redacted logs to GitHub issues, without inventing a built-in redaction feature."
         }
       ]
     },
     {
       "title": "Usage Examples",
-      "purpose": "Overview of the practical usage resources included in the repository, linking to child pages for the Jupyter notebook walkthrough and usage tips.",
+      "purpose": "Overview of the practical usage resources in the repository, linking to the Jupyter notebook walkthrough and to scripting and automation patterns.",
       "page_notes": [
         {
-          "content": ""
+          "content": "Keep this page short and route readers to the child pages. Use the usage/ directory and docs/index.md."
         }
       ]
     },
     {
       "title": "Jupyter Notebook Walkthrough",
-      "purpose": "Detailed guide to usage/basic_device_control.ipynb: how to run it, what each cell demonstrates (instantiation, getStatus output structure, each control method, type-error handling), and how to adapt it for real devices.",
+      "purpose": "Guide to usage/basic_device_control.ipynb: how to run it, what each cell demonstrates (instantiation, getStatus output structure, each control method, type-error handling), and how to adapt it to a real device safely.",
       "parent": "Usage Examples",
       "page_notes": [
         {
-          "content": ""
+          "content": "Read the notebook cells directly. Remind readers to use a test device on a trusted LAN and to clear or redact notebook outputs that contain device identifiers or MAC addresses before committing."
         }
       ]
     },
     {
       "title": "Home Automation and Scripting Patterns",
-      "purpose": "Practical patterns for integrating the library into automation workflows: polling loops, error handling for offline devices, logging, and comparison with the venta_protocol_v3_device API for migration.",
+      "purpose": "Practical patterns for using the library in scripts and automations: polling loops, handling offline or slow devices, verifying that a command took effect via the boolean return value, logging, and wrapping the library in larger smart-home integrations.",
       "parent": "Usage Examples",
       "page_notes": [
         {
-          "content": ""
+          "content": "Present patterns as examples built on the documented API, not as built-in features. Do not claim native Home Assistant, Homey or MQTT support; the library is a plain synchronous client unless the source shows otherwise. Link to the protocol-choice page for how the device type determines the library instead of repeating it."
+        }
+      ]
+    },
+    {
+      "title": "Testing and Quality",
+      "purpose": "Explain how the library is tested: the tests/ directory, what the tests cover (validation, response processing, hardening behavior), how to run them locally, and how the tests workflow runs them in CI.",
+      "page_notes": [
+        {
+          "content": "Inspect tests/, pyproject.toml and the tests workflow before writing; the documentation site shows a tests badge but the older wiki did not cover testing at all. State whether tests use mocked HTTP responses or real devices, and how the maintainer's local-device regression testing relates to automated tests, only as the repository shows."
         }
       ]
     },
     {
       "title": "Packaging and Distribution",
-      "purpose": "Overview of how the library is packaged and published, linking to child pages for build configuration and PyPI release process.",
+      "purpose": "Overview of how the library is packaged and published, linking to build configuration and the PyPI release process.",
       "page_notes": [
         {
-          "content": ""
+          "content": "Keep this page short. Use pyproject.toml, setup.py and the PyPI project page as sources, and link to the child pages for detail."
         }
       ]
     },
     {
       "title": "Build Configuration",
-      "purpose": "Documents pyproject.toml and setup.py: project metadata (name, version, license, authors), Python version requirements, the requests dependency pin, setuptools build backend, and the egg-info metadata files.",
+      "purpose": "Document pyproject.toml and setup.py: project name, version, license, author, Python requirement, declared dependencies, build backend, and the committed dist/ and egg-info metadata.",
       "parent": "Packaging and Distribution",
       "page_notes": [
         {
-          "content": ""
+          "content": "Reconcile pyproject.toml with setup.py and explain which one is authoritative. PyPI shows no declared dependencies, so verify whether any dependency such as requests is declared and say what the files actually contain. Treat dist/ and egg-info as committed build outputs, not as configuration."
         }
       ]
     },
     {
       "title": "PyPI Release and Distribution Artifacts",
-      "purpose": "Explains the publish.yml GitHub Actions workflow that builds and uploads the package to PyPI on release events, the OIDC trusted-publishing mechanism, and the dist/ wheel and sdist artifacts.",
+      "purpose": "Explain the publish workflow that builds and uploads the package to PyPI on release events, the trusted-publishing mechanism, the sdist and wheel artifacts, and the release history of 0.1.0, 0.1.1 and 0.1.2.",
       "parent": "Packaging and Distribution",
       "page_notes": [
         {
-          "content": ""
+          "content": "Use the publish workflow under .github/workflows/ and the PyPI release history. PyPI shows 0.1.1 and 0.1.2 with full provenance and 0.1.0 without; mention this only as an observation about published artifacts. Explain that PyPI versions are immutable, so a fix requires a new version number. Do not invent release notes for individual versions."
         }
       ]
     },
     {
       "title": "CI/CD and Repository Automation",
-      "purpose": "Overview of the three GitHub Actions workflows and supporting configuration that automate quality checks, documentation deployment, and dependency management.",
+      "purpose": "Overview of the GitHub Actions workflows and supporting configuration that run tests, code scanning, documentation deployment, dependency updates and package publishing.",
       "page_notes": [
         {
-          "content": ""
+          "content": "Enumerate every file under .github/workflows/ rather than relying on the earlier three-workflow description; the docs site shows badges for tests, CodeQL and Pages deployment, and a publish workflow exists. Summarize each workflow's trigger in one line and link to the child pages."
         }
       ]
     },
     {
       "title": "CodeQL Security Analysis",
-      "purpose": "Details the codeql.yml workflow: triggers (push/PR to main), path filters, the Python CodeQL matrix, autobuild step, docs/ exclusion, and how results surface in the GitHub Security tab.",
+      "purpose": "Detail the codeql.yml workflow: triggers, path filters, the Python analysis, build step, docs/ handling, and how results appear in the GitHub Security tab.",
       "parent": "CI/CD and Repository Automation",
       "page_notes": [
         {
-          "content": ""
+          "content": "Read codeql.yml directly and report triggers, schedules and query suites exactly as configured."
         }
       ]
     },
     {
       "title": "Documentation Deployment Pipeline",
-      "purpose": "Explains the deploy-pages.yml workflow: Jekyll build from docs/, artifact management to avoid duplicates, GitHub Pages deployment, and the manual workflow_dispatch trigger.",
+      "purpose": "Explain the Pages workflow that builds docs/ with Jekyll and deploys the single-page documentation site to GitHub Pages, including triggers, artifact handling and the manual dispatch option.",
       "parent": "CI/CD and Repository Automation",
       "page_notes": [
         {
-          "content": ""
+          "content": "Read the Pages workflow (named deploy-pages.yml in earlier wiki text; verify) and docs/. The site is a single page, docs/index.md, with sections for the package overview, installation, quick example, reading device data, supported commands, discovery, network security, logging and privacy, notes, contribution credit and license. Keep end-user GitHub Pages documentation distinct from this generated engineering reference."
         }
       ]
     },
     {
       "title": "Dependency Management and Repository Governance",
-      "purpose": "Covers the Dependabot configuration for automated dependency updates, the CODEOWNERS file assigning @tonyjurg as reviewer, and the .gitignore patterns.",
+      "purpose": "Cover the Dependabot configuration, the CODEOWNERS file, the .gitignore patterns, issue and pull request guidance, and the MIT license.",
       "parent": "CI/CD and Repository Automation",
       "page_notes": [
         {
-          "content": ""
+          "content": "Verify that .github/dependabot.yml and CODEOWNERS exist and quote their real settings. README and docs welcome issues and pull requests; describe contribution expectations only as the repository states them."
         }
       ]
     },
     {
       "title": "Glossary",
-      "purpose": "Definitions of all codebase-specific terms, protocol concepts, attribute names, and abbreviations that an onboarding engineer needs to understand when working with this library. Each entry includes code pointers.",
+      "purpose": "Define project-specific terms (protocol v2, protocol v3, /datastructure, DHCP reservation, getStatus, runUpdate, LED strip mode, power mode, trusted LAN, trusted publishing) with links to the pages that explain them.",
       "page_notes": [
         {
-          "content": ""
+          "content": "Keep definitions short and link to focused pages rather than duplicating explanations. Include code pointers only for terms that map to real symbols in the source."
         }
       ]
     }
