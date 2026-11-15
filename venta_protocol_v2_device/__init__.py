@@ -25,6 +25,48 @@ class Venta_Protocol_v2_Device:
 
     This library mirrors the public API style of venta_protocol_v3_device as closely as possible,
     while adapting request/response handling to the V2 endpoint (/datastructure).
+
+    Args:
+        IP: Private IPv4 address of the Venta device on the local network.
+
+    Attributes:
+        IP: Validated device IPv4 address.
+        DeviceType: Device type identifier reported by the device.
+        MacAdress: Device MAC address as reported by its V2 response.
+        ProtocolV: Protocol version reported by the device.
+        Status: Device status string.
+        Power: Whether the device is powered on.
+        FanSpeed: Current fan speed value.
+        TargetHum: Requested target humidity.
+        SleepMode: Whether sleep mode is active.
+        Automatic: Whether automatic mode is active.
+        BaLiNormal: Normal-mode balance setting.
+        BaLiSleep: Sleep-mode balance setting.
+        BaLiStandby: Standby-mode balance setting.
+        LEDStripActive: Whether the LED strip is active.
+        LEDStripMode: Current LED strip mode value.
+        LEDStrip: LED strip color value.
+        SWMain: Main software version reported by the device.
+        SWWIFI: Wi-Fi software version reported by the device.
+        OperationT: Device operation time in minutes.
+        DiscIonT: Disc ionization time in minutes.
+        CleaningT: Cleaning time in minutes.
+        FilterT: Filter time in minutes.
+        ServiceT: Service time in minutes.
+        HwIndexMB: Main-board hardware index.
+        HwIndexOption: Option-board hardware index.
+        Warnings: Device warning bit field.
+        Temperature: Temperature reported by the device.
+        Humidity: Humidity reported by the device.
+        Dust: Dust measurement reported by the device.
+        WaterLevel: Water-level value reported by the device.
+        FanRpm: Primary fan speed in revolutions per minute.
+        FanRpm2: Secondary fan speed in revolutions per minute.
+        DaysToService: Estimated days remaining until service is due.
+
+    Note:
+        Methods that communicate with the device use its HTTP API on the local
+        network. Constructing this class only validates and stores the address.
     """
 
     _RESPONSE_FIELD_TYPES = {
@@ -64,6 +106,15 @@ class Venta_Protocol_v2_Device:
     _MAX_RESPONSE_BYTES = 256 * 1024
 
     def __init__(self, IP: str):
+        """Create a client for a Venta device at a private IPv4 address.
+
+        Args:
+            IP: Device address, such as ``"192.168.1.20"``.
+
+        Raises:
+            TypeError: If ``IP`` is not a string.
+            ValueError: If ``IP`` is not a private IPv4 address.
+        """
         validated_ip = self._validate_device_ip(IP)
         self._endpoint = _DeviceEndpoint(validated_ip)
         self.IP: str = validated_ip
@@ -111,29 +162,102 @@ class Venta_Protocol_v2_Device:
         self.DaysToService: int = 0
 
     def getStatus(self) -> Dict[str, Any]:
+        """Request the current device data and update this object's fields.
+
+        Returns:
+            The decoded device response as a dictionary.
+
+        Raises:
+            requests.RequestException: If the HTTP request fails.
+            ValueError: If the response is too large or is not a JSON object.
+            TypeError: If a recognized response field has an unexpected type.
+        """
         return self._makeCall("/datastructure")
 
     def setAutomatic(self, target: bool) -> bool:
+        """Enable or disable automatic mode, powering on the device.
+
+        Args:
+            target: ``True`` to enable automatic mode, otherwise ``False``.
+
+        Returns:
+            Whether the response confirms the requested automatic setting.
+
+        Raises:
+            TypeError: If ``target`` is not a boolean.
+            requests.RequestException: If communication with the device fails.
+        """
         target = self._require_bool("target", target)
         self._setAction({"Power": True, "SleepMode": False, "Automatic": target})
         return self.Automatic == target
 
     def setSleepMode(self, target: bool) -> bool:
+        """Enable or disable sleep mode, powering on the device.
+
+        Args:
+            target: ``True`` to enable sleep mode, otherwise ``False``.
+
+        Returns:
+            Whether the response confirms the requested sleep setting.
+
+        Raises:
+            TypeError: If ``target`` is not a boolean.
+            requests.RequestException: If communication with the device fails.
+        """
         target = self._require_bool("target", target)
         self._setAction({"Power": True, "SleepMode": target, "Automatic": False})
         return self.SleepMode == target
 
     def setFanSpeed(self, target: int) -> bool:
+        """Set the fan speed and disable automatic and sleep modes.
+
+        Args:
+            target: Fan speed value accepted by the device.
+
+        Returns:
+            Whether the response confirms the requested fan speed.
+
+        Raises:
+            TypeError: If ``target`` is not an integer (booleans are rejected).
+            requests.RequestException: If communication with the device fails.
+        """
         target = self._require_int("target", target)
         self._setAction({"Power": True, "SleepMode": False, "Automatic": False, "FanSpeed": target})
         return self.FanSpeed == target
 
     def setTargetHum(self, target: int) -> bool:
+        """Set the target humidity.
+
+        Args:
+            target: Target humidity value accepted by the device.
+
+        Returns:
+            Whether the response confirms the requested target humidity.
+
+        Raises:
+            TypeError: If ``target`` is not an integer (booleans are rejected).
+            requests.RequestException: If communication with the device fails.
+        """
         target = self._require_int("target", target)
         self._setAction({"TargetHum": target})
         return self.TargetHum == target
 
     def setPower(self, target: bool) -> bool:
+        """Turn the device on or off.
+
+        Turning the device on also disables automatic and sleep modes and
+        ensures the requested fan speed is at least one.
+
+        Args:
+            target: ``True`` to power on, otherwise ``False``.
+
+        Returns:
+            Whether the response confirms the requested power state.
+
+        Raises:
+            TypeError: If ``target`` is not a boolean.
+            requests.RequestException: If communication with the device fails.
+        """
         target = self._require_bool("target", target)
         if target:
             self._setAction({"Power": True, "SleepMode": False, "Automatic": False, "FanSpeed": max(self.FanSpeed, 1)})
@@ -142,26 +266,86 @@ class Venta_Protocol_v2_Device:
         return self.Power == target
 
     def setLEDStripActive(self, target: bool) -> bool:
+        """Enable or disable the LED strip.
+
+        Args:
+            target: ``True`` to enable the strip, otherwise ``False``.
+
+        Returns:
+            Whether the response confirms the requested state.
+
+        Raises:
+            TypeError: If ``target`` is not a boolean.
+            requests.RequestException: If communication with the device fails.
+        """
         target = self._require_bool("target", target)
         self._setAction({"LEDStripActive": target})
         return self.LEDStripActive == target
 
     def setLEDStripMode(self, mode: int) -> bool:
+        """Select an LED strip mode.
+
+        Args:
+            mode: Mode value accepted by the device.
+
+        Returns:
+            Whether the response confirms the requested mode.
+
+        Raises:
+            TypeError: If ``mode`` is not an integer (booleans are rejected).
+            requests.RequestException: If communication with the device fails.
+        """
         mode = self._require_int("mode", mode)
         self._setAction({"LEDStripMode": mode})
         return self.LEDStripMode == mode
 
     def setLEDStripColor(self, color: str) -> bool:
+        """Set the LED strip color.
+
+        Args:
+            color: Color value in the format expected by the device.
+
+        Returns:
+            Whether the response confirms the requested color.
+
+        Raises:
+            TypeError: If ``color`` is not a string.
+            requests.RequestException: If communication with the device fails.
+        """
         color = self._require_str("color", color)
         self._setAction({"LEDStrip": color})
         return self.LEDStrip == color
 
     def setPowerMode(self, mode: str) -> bool:
+        """Send a device-specific power mode command.
+
+        Args:
+            mode: Power mode command understood by the device.
+
+        Returns:
+            Whether the response contains an ``Action`` entry.
+
+        Raises:
+            TypeError: If ``mode`` is not a string.
+            requests.RequestException: If communication with the device fails.
+        """
         mode = self._require_str("mode", mode)
         response = self._setAction({"mode": mode})
         return "Action" in response
 
     def runUpdate(self, updateAction: str) -> bool:
+        """Send a device-specific update action.
+
+        Args:
+            updateAction: Update command understood by the device.
+
+        Returns:
+            Whether the response contains an ``Action`` entry.
+
+        Raises:
+            TypeError: If ``updateAction`` is not a string.
+            requests.RequestException: If communication with the device fails.
+        """
         updateAction = self._require_str("updateAction", updateAction)
         response = self._setAction({"Update": updateAction})
         return "Action" in response
@@ -301,4 +485,9 @@ class Venta_Protocol_v2_Device:
                 callback(prop, value)
 
     def toJSON(self) -> str:
+        """Serialize the client's current state as indented JSON.
+
+        Returns:
+            A JSON string with keys sorted alphabetically.
+        """
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
