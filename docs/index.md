@@ -9,7 +9,7 @@ permalink: /
   <h1 id="venta-protocol-v2-device">Venta Protocol V2 Device</h1>
   <p class="lead">Control your Venta humidifier or air washer from Python. Read device status, monitor sensor values, and automate everyday settings on your local network.</p>
   <div class="link-actions">
-    <a href="{{ '/#installation' | relative_url }}">Get started</a>
+    <a href="{{ '/getting-started/' | relative_url }}">Get started</a>
     <a href="{{ site.github_url }}">View on GitHub</a>
   </div>
 </section>
@@ -25,6 +25,14 @@ permalink: /
 `venta-protocol-v2-device` is a small Python package for controlling Venta air humidifiers and air washers on your local network.
 
 It is made for Venta devices that use **protocol version 2** and expose the `/datastructure` endpoint. You give the package the device IP address, and it lets you read the current status or send simple control commands from Python. If you want to control devices using **protocol version 3**, you can examine [`bobiboy/venta_protocol_v3_device`](https://github.com/bobiboy/venta_protocol_v3_device).
+
+## Documentation
+
+- [Getting Started]({{ '/getting-started/' | relative_url }}): install the package and read your first device response.
+- [User Guide]({{ '/user-guide/' | relative_url }}): understand settings, returned values, and errors.
+- [Architecture]({{ '/architecture/' | relative_url }}): follow a request from Python to the device and back.
+- [Examples]({{ '/examples/' | relative_url }}): try scripts and the existing notebook.
+- [Contributing]({{ '/contributing/' | relative_url }}): set up a checkout, run tests, and propose changes.
 
 ## What This Package Does
 
@@ -111,7 +119,7 @@ The main control methods are:
 - `setPowerMode(str)`
 - `runUpdate(str)`
 
-Each method sends a request to the Venta device and returns `True` when the requested value is reflected in the device response.
+Each method sends a request to the Venta device. Most setters compare the resulting cached attribute with the requested value; `setPowerMode()` and `runUpdate()` instead check whether the response contains an `Action` section. See the [User Guide]({{ '/user-guide/#command-results' | relative_url }}) for return-value limitations and mode changes.
 
 ## Device Discovery
 

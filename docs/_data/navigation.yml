@@ -1,14 +1,13 @@
-# Use existing destinations until the dedicated pages are introduced in PR 2.
 # repository_path destinations are relative to github_url; url destinations to baseurl.
 - title: Home
   url: /
 - title: Getting Started
-  url: /#installation
+  url: /getting-started/
 - title: User Guide
-  url: /#reading-device-data
+  url: /user-guide/
 - title: Architecture
-  repository_path: /tree/main/venta_protocol_v2_device
+  url: /architecture/
 - title: Examples
-  repository_path: /blob/main/usage/basic_device_control.ipynb
+  url: /examples/
 - title: Contributing
-  repository_path: /blob/main/README.md#corrections-andor-additions
+  url: /contributing/
