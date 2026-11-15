@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Build and deploy documentation
 
 on:
   push:
@@ -6,45 +6,101 @@ on:
       - main
     paths:
       - 'docs/**'
+      - 'venta_protocol_v2_device/**'
+      - 'scripts/build_api_docs.py'
+      - 'requirements-docs.txt'
+      - 'pyproject.toml'
       - '.github/workflows/deploy-pages.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'venta_protocol_v2_device/**'
+      - 'scripts/build_api_docs.py'
+      - 'requirements-docs.txt'
+      - 'pyproject.toml'
+      - '.github/workflows/deploy-pages.yml'
+  release:
+    types: [published, edited, deleted]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+
+concurrency:
+  group: pages-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'deploy' }}
+  cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
+    name: Build Jekyll site and Sphinx API
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          # Release events must build the current main API, not the released tag.
+          ref: ${{ github.event_name == 'pull_request' && github.ref || 'main' }}
 
-      - name: Configure Pages
-        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
-
-      - name: Build site
+      - name: Build Jekyll site
         uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1
         with:
           source: ./docs
           destination: ./_site
 
-      - name: Remove old artifacts (prevent duplicate error)
-        uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118 # v6
-        with:
-          name: github-pages
-          failOnError: false
+      - name: Prepare combined site
+        run: |
+          mkdir -p .cache/pages-site
+          cp -R _site/. .cache/pages-site/
 
-      - name: Upload artifact
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      - name: Install documentation dependencies
+        run: python -m pip install -r requirements-docs.txt
+
+      - name: Build versioned Sphinx API (pull request)
+        if: github.event_name == 'pull_request'
+        run: python scripts/build_api_docs.py --output .cache/pages-site/api
+
+      - name: Build versioned Sphinx API
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/build_api_docs.py --output .cache/pages-site/api
+
+      - name: Verify combined site
+        run: |
+          test -s .cache/pages-site/index.html
+          test -s .cache/pages-site/api/index.html
+          test -s .cache/pages-site/api/versions.json
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
-          path: './_site'
+          path: ./.cache/pages-site
 
+  deploy:
+    name: Deploy documentation
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
