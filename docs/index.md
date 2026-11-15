@@ -1,13 +1,26 @@
 ---
 title: Venta Protocol V2 Device
 description: A small Python package for controlling Venta air humidifiers and air washers that use protocol version 2.
+permalink: /
 ---
 
-# Venta Protocol V2 Device
+<section class="hero" aria-labelledby="venta-protocol-v2-device">
+  <p class="eyebrow">Python · Local network · Protocol V2</p>
+  <h1 id="venta-protocol-v2-device">Venta Protocol V2 Device</h1>
+  <p class="lead">Control your Venta humidifier or air washer from Python. Read device status, monitor sensor values, and automate everyday settings on your local network.</p>
+  <div class="link-actions">
+    <a href="{{ '/#installation' | relative_url }}">Get started</a>
+    <a href="{{ site.github_url }}">View on GitHub</a>
+  </div>
+</section>
+
+<div class="badges" markdown="1">
 
 [![GitHub repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/tonyjurg/venta_protocol_v2_device) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)  [![PyPI Version](https://img.shields.io/pypi/v/venta-protocol-v2-device)](https://pypi.org/project/venta-protocol-v2-device/) [![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/tonyjurg/venta_protocol_v2_device)
 
 [![Tests on main](https://img.shields.io/github/actions/workflow/status/tonyjurg/venta_protocol_v2_device/tests.yml?branch=main&label=tests&logo=github)](https://github.com/tonyjurg/venta_protocol_v2_device/actions/workflows/tests.yml?query=branch%3Amain) [![CodeQL on main](https://img.shields.io/github/actions/workflow/status/tonyjurg/venta_protocol_v2_device/codeql.yml?branch=main&label=CodeQL&logo=github)](https://github.com/tonyjurg/venta_protocol_v2_device/actions/workflows/codeql.yml?query=branch%3Amain) [![Pages deployment on main](https://img.shields.io/github/actions/workflow/status/tonyjurg/venta_protocol_v2_device/deploy-pages.yml?branch=main&label=pages&logo=github)](https://github.com/tonyjurg/venta_protocol_v2_device/actions/workflows/deploy-pages.yml?query=branch%3Amain)
+
+</div>
 
 `venta-protocol-v2-device` is a small Python package for controlling Venta air humidifiers and air washers on your local network.
 
