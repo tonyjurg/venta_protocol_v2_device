@@ -1,0 +1,30 @@
+{% extends "!layout.html" %}
+
+{% block sidebartitle %}
+<a href="{{ pathto('index') }}" class="api-brand">Venta Protocol V2</a>
+<p class="api-brand-caption">Python API reference</p>
+{% include "searchbox.html" %}
+{% if docs_versions %}
+<nav class="version-picker" aria-label="API documentation version">
+  <label for="docs-version">Version</label>
+  <select id="docs-version" onchange="window.location.href = this.value;">
+    {% for entry in docs_versions %}
+    <option value="{{ pathto('_static', 1) }}/{{ entry.relative_url }}"{% if entry.label == docs_version %} selected{% endif %}>{{ entry.label }}</option>
+    {% endfor %}
+  </select>
+  <noscript>
+    {% for entry in docs_versions %}
+    <a href="{{ pathto('_static', 1) }}/{{ entry.relative_url }}">{{ entry.label }}</a>
+    {% endfor %}
+  </noscript>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block navigation %}
+{{ super() }}
+<div class="api-project-links">
+  <a href="https://tonyjurg.github.io/venta_protocol_v2_device/">Project documentation <span aria-hidden="true">↗</span></a>
+  <a href="https://github.com/tonyjurg/venta_protocol_v2_device">GitHub repository <span aria-hidden="true">↗</span></a>
+</div>
+{% endblock %}
