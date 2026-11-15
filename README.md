@@ -6,6 +6,10 @@
 
 Small Python library to control Venta Air Humidifiers and Washers that use Protocol Version 2 (i.e., the ones using the `/datastructure` endpoint).
 
+## Documentation
+
+Read the [Venta Protocol V2 documentation website](https://tonyjurg.github.io/venta_protocol_v2_device/) for setup instructions, usage guides, architecture notes, and examples. The [Python API reference](https://tonyjurg.github.io/venta_protocol_v2_device/api/) documents the current development branch and published releases.
+
 This package intentionally mirrors the public API style of
 [`venta_protocol_v3_device`](https://github.com/bobiboy/venta_protocol_v3_device)
 so migration/addaptation effort is kept at a minimum.
@@ -59,6 +63,35 @@ d = Venta_Protocol_v2_Device("192.168.178.87")
 ```
 
 If you need stable addressing, configure a DHCP reservation for the Venta device in your router or access point.
+
+## Build the documentation locally
+
+The website uses Jekyll and the API reference uses Sphinx. Documentation tools are separate from the package's runtime dependencies. Use Python 3.12 or newer for the full versioned API build, plus Ruby with Jekyll and the `jekyll-seo-tag` plugin.
+
+Install the tools:
+
+```bash
+gem install jekyll jekyll-seo-tag
+python -m pip install -r requirements-docs.txt
+```
+
+From the repository root, build the website and the current API reference:
+
+```bash
+jekyll build --source docs --destination _site
+python scripts/build_api_docs.py --output _site/api --current-only
+python scripts/validate_docs.py --site _site
+```
+
+To include historical published releases, fetch the tags and run the versioned API builder instead. This step queries the public GitHub Releases API and needs an internet connection:
+
+```bash
+git fetch --tags
+python scripts/build_api_docs.py --output _site/api
+python scripts/validate_docs.py --site _site
+```
+
+The combined preview is written to `_site/`; the API reference starts at `_site/api/index.html`. GitHub Pages publishes the same site at `https://tonyjurg.github.io/venta_protocol_v2_device/`.
 
 ## Network security
 

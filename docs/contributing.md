@@ -60,7 +60,11 @@ The project pages live in `docs/` and use Jekyll with a shared layout. Each page
 
 Use Jekyll's `relative_url` filter for internal links so they include `/venta_protocol_v2_device/` on GitHub Pages. Keep existing page URLs and heading anchors working when moving content. Verify method names, argument types, and examples against the Python implementation; label device-specific observations rather than presenting them as universal protocol guarantees.
 
-The website does not execute code examples during its build. Keep documentation dependencies separate from runtime dependencies and make examples testable with mocks. The Jekyll configuration reserves `docs/api/` for a separately built API reference; the Sphinx setup and local combined-build instructions are deferred to the later documentation PRs.
+The website does not execute code examples during its build. Keep documentation dependencies separate from runtime dependencies and make examples testable with mocks. Jekyll builds the project pages, and Sphinx builds the API reference from the package source; the Pages workflow combines those outputs without publishing a Python package.
+
+### Build documentation locally
+
+The repository [README build instructions]({{ site.github_url }}/blob/main/README.md#build-the-documentation-locally) list the Ruby, Jekyll, and Python requirements and commands for building the current or versioned API reference. The full API build uses the published release tags and requires Python 3.12 or newer plus an internet connection. It does not need Venta hardware.
 
 ## Submit a pull request
 

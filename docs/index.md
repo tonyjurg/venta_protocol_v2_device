@@ -10,6 +10,7 @@ permalink: /
   <p class="lead">Control your Venta humidifier or air washer from Python. Read device status, monitor sensor values, and automate everyday settings on your local network.</p>
   <div class="link-actions">
     <a href="{{ '/getting-started/' | relative_url }}">Get started</a>
+    <a href="{{ '/api/' | relative_url }}">Python API reference</a>
     <a href="{{ site.github_url }}">View on GitHub</a>
   </div>
 </section>
@@ -32,6 +33,7 @@ It is made for Venta devices that use **protocol version 2** and expose the `/da
 - [User Guide]({{ '/user-guide/' | relative_url }}): understand settings, returned values, and errors.
 - [Architecture]({{ '/architecture/' | relative_url }}): follow a request from Python to the device and back.
 - [Examples]({{ '/examples/' | relative_url }}): try scripts and the existing notebook.
+- [Python API Reference]({{ '/api/' | relative_url }}): browse the current and published-release API documentation.
 - [Contributing]({{ '/contributing/' | relative_url }}): set up a checkout, run tests, and propose changes.
 
 ## What This Package Does

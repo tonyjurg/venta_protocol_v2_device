@@ -8,6 +8,7 @@ on:
       - 'docs/**'
       - 'venta_protocol_v2_device/**'
       - 'scripts/build_api_docs.py'
+      - 'scripts/validate_docs.py'
       - 'requirements-docs.txt'
       - 'pyproject.toml'
       - '.github/workflows/deploy-pages.yml'
@@ -16,6 +17,7 @@ on:
       - 'docs/**'
       - 'venta_protocol_v2_device/**'
       - 'scripts/build_api_docs.py'
+      - 'scripts/validate_docs.py'
       - 'requirements-docs.txt'
       - 'pyproject.toml'
       - '.github/workflows/deploy-pages.yml'
@@ -78,9 +80,7 @@ jobs:
 
       - name: Verify combined site
         run: |
-          test -s .cache/pages-site/index.html
-          test -s .cache/pages-site/api/index.html
-          test -s .cache/pages-site/api/versions.json
+          python scripts/validate_docs.py --site .cache/pages-site
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
