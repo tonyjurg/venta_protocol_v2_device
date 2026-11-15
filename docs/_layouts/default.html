@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    {% seo %}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="site-nav">
+        <a class="site-title" href="{{ '/' | relative_url }}">
+          <span class="site-mark" aria-hidden="true">V2</span>
+          <span>{{ site.title }}</span>
+        </a>
+        <nav aria-label="Main navigation">
+          <ul class="nav-links">
+            {% for item in site.data.navigation %}
+            <li>
+              {% if item.repository_path %}
+              <a href="{{ site.github_url }}{{ item.repository_path }}">{{ item.title }} <span class="external-label">(GitHub)</span></a>
+              {% else %}
+              <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" class="page" tabindex="-1">
+      {{ content }}
+    </main>
+    <footer class="site-footer">
+      <p>{{ site.title }} <span aria-hidden="true">·</span> Python on your local network</p>
+      <nav aria-label="Project links">
+        <a href="{{ site.github_url }}">GitHub</a>
+        <a href="https://pypi.org/project/venta-protocol-v2-device/">PyPI</a>
+        <a href="{{ site.github_url }}/blob/main/LICENSE">MIT License</a>
+      </nav>
+    </footer>
+  </body>
+</html>

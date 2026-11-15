@@ -1,0 +1,25 @@
+title: Venta Protocol V2
+description: Python control for Venta air humidifiers and air washers on your local network.
+lang: en
+url: https://tonyjurg.github.io
+baseurl: /venta_protocol_v2_device
+github_url: https://github.com/tonyjurg/venta_protocol_v2_device
+
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-seo-tag
+
+# The API reference will be built separately by Sphinx.
+exclude:
+  - api
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
