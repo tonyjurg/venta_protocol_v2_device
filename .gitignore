@@ -1,3 +1,7 @@
 __pycache__/
 *.py[cod]
 .notes
+.pytest_cache/
+.cache/
+_site/
+.jekyll-cache/
