@@ -1,4 +1,4 @@
 # Documentation-only dependencies. Install these separately from the runtime package.
 requests>=2.32.4,<3
-Sphinx>=7.1,<9
-sphinx-rtd-theme>=2,<4
+Sphinx>=8.1.3,<9
+sphinx-rtd-theme>=3.1.0,<4
